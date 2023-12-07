@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "this is the backend of the video streming app name ytlite",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "js",
@@ -13,5 +15,12 @@
     "mongo"
   ],
   "author": "Sangam saini",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.0"
+  }
 }

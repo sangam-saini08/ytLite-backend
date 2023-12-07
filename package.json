@@ -1,0 +1,17 @@
+{
+  "name": "ytlite-backend",
+  "version": "1.0.0",
+  "description": "this is the backend of the video streming app name ytlite",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "js",
+    "node",
+    "express",
+    "mongo"
+  ],
+  "author": "Sangam saini",
+  "license": "ISC"
+}

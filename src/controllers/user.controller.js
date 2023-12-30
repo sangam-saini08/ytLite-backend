@@ -205,4 +205,121 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 });
 
-export { resgisterUser, loginUser, logoutUser, refreshAccessToken };
+const updatePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    throw new ApiError(401, "old password or new password are required");
+  }
+
+  const user = await User.findById(req.user._id);
+
+  if (!(await user.isPasswordCorrect(oldPassword))) {
+    throw new ApiError(401, "old password is incorrect");
+  }
+
+  user.password = newPassword;
+
+  await user.save({ validateBeforeSave: false });
+
+  return res.staus(200).json(new ApiRespones(200, {}, "password updated"));
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(
+      ApiRespones(200, { data: req.user }, "current user get successfully")
+    );
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body;
+
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullName,
+        email,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiRespones(200, { user }, "user details updated successfully"));
+});
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "avatar local path is missing");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar) {
+    throw new ApiError(400, "error while uploading avatar on cloudinary");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiRespones(200, { user }, "avatar file updated successfully"));
+});
+
+const updateUserCover = asyncHandler(async (req, res) => {
+  const coverLocalPath = req.file?.path;
+
+  if (!coverLocalPath) {
+    throw new ApiError(400, "cover local path is missing");
+  }
+
+  const cover = await uploadOnCloudinary(coverLocalPath);
+
+  if (!cover) {
+    throw new ApiError(400, "error while uploading cover on cloudinary");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        coverImage: cover.url,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiRespones(200, { user }, "coverImage updated successfully"));
+});
+
+export {
+  resgisterUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  updatePassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateUserAvatar,
+  updateUserCover,
+};

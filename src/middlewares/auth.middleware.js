@@ -31,7 +31,7 @@ const verifyJwt = asyncHandler(async (req, _, next) => {
     next();
   } catch (error) {
     console.log("error : ", error);
-    throw new ApiError(400, "something went wrong while logout");
+    throw new ApiError(400, "something went wrong verifying jwt token");
   }
 });
 

@@ -33,10 +33,10 @@ router.route("/current-user").get(verifyJwt, getCurrentUser);
 router.route("/update-account").patch(verifyJwt, updateAccountDetails);
 
 router
-  .route("avatar")
+  .route("/avatar")
   .patch(verifyJwt, upload.single("avatar"), updateUserAvatar);
 router
-  .route("cover-image")
+  .route("/cover-image")
   .patch(verifyJwt, upload.single("coverImage"), updateUserCover);
 
 router.route("/c/:username").get(verifyJwt, getUserChannelProfile);

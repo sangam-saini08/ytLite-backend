@@ -220,19 +220,19 @@ const updatePassword = asyncHandler(async (req, res) => {
 
   await user.save({ validateBeforeSave: false });
 
-  return res.staus(200).json(new ApiRespones(200, {}, "password updated"));
+  return res.status(200).json(new ApiRespones(200, {}, "password updated"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = req?.user;
   return res
     .status(200)
-    .json(
-      ApiRespones(200, { data: req.user }, "current user get successfully")
-    );
+    .json(new ApiRespones(200, { user }, "current user get successfully"));
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body;
+  console.log(fullName, email);
 
   if (!fullName || !email) {
     throw new ApiError(400, "All fields are required");

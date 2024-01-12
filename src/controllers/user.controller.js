@@ -313,6 +313,8 @@ const updateUserCover = asyncHandler(async (req, res) => {
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
 
+  console.log("this is the username :", username);
+
   if (!username) {
     throw new ApiError(400, "username is missing from params");
   }
@@ -349,7 +351,18 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         },
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user?._id, "subscribers?.subscriber"] },
+            if: {
+              $in: [
+                req.user?._id,
+                {
+                  $map: {
+                    input: "$subscribers",
+                    as: "object",
+                    in: "$$object.subscriber",
+                  },
+                },
+              ],
+            },
             then: true,
             else: false,
           },

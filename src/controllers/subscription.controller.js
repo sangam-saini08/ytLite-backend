@@ -9,6 +9,8 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
   const subscriberId = req.user._id;
 
+  console.log("this is the channle Id :", channelId);
+
   if (!isValidObjectId(channelId)) {
     throw new ApiError(400, "Invalid channel Id"); // check if channelId is valid
   }
@@ -19,12 +21,18 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User not found in this channel Id");
   }
 
-  const subscribe = await Subscription.create({
-    subscriber: new mongoose.types.objectId(subscriberId),
-    channel: new mongoose.types.objectId(channelId),
+  const alreadySubscribed = await Subscription.findOne({
+    $and: [{ channel: channelId }, { subscriber: subscriberId }],
   });
 
-  console.log(subscribe);
+  if (alreadySubscribed) {
+    throw new ApiError(400, " already subscribed ");
+  }
+
+  await Subscription.create({
+    subscriber: subscriberId,
+    channel: channel._id,
+  });
 
   res.status(201).json(new ApiRespones(201, {}, "subscribed"));
 });

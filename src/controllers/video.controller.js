@@ -7,8 +7,60 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+  const { page, limit = 10, query, sortBy, sortType, userId } = req.query;
   //TODO: get all videos based on query, sort, pagination
+
+  let skip = parseInt(limit * (page - 1));
+  const match = {};
+  if (query) {
+    match.title = { $regex: query, $options: "i" };
+  }
+
+  if (userId) {
+    match.userId = userId;
+  }
+
+  const sort = {};
+  if (sortBy) {
+    sort[sortBy] = sortType === "desc" ? -1 : 1;
+  }
+
+  const pipeline = [{ $match: match }];
+
+  if (Object.keys(sort).length > 0) {
+    pipeline.push({ $sort: sort });
+  }
+
+  pipeline.push({ $skip: skip }, { $limit: limit });
+
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "owner",
+      foreignField: "_id",
+      as: "owner",
+      pipeline: [
+        {
+          $project: {
+            _id: 1,
+            username: 1,
+            email: 1,
+            fullName: 1,
+            avatar: 1,
+            coverImage: 1,
+            wathchHistory: 1,
+            createdAt: 1,
+            updatedAt: 1,
+          },
+        },
+      ],
+    },
+  });
+
+  const videos = await Video.aggregate(pipeline);
+  console.log(videos);
+
+  res.status(200).json(new ApiRespones(200, videos, "videos fetch success"));
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {

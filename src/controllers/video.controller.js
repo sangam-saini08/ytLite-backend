@@ -226,6 +226,29 @@ const updateVideo = asyncHandler(async (req, res) => {
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   //TODO: delete video
+
+  const exitiedVideo = await Video.findById(videoId);
+
+  if (!exitiedVideo) {
+    throw new ApiError(400, "videoID is invaild");
+  }
+
+  const videoPublicId = exitiedVideo.videoFile.split("/").pop().split(".")[0];
+  const thumbnailPublicId = exitiedVideo.thumbnail
+    .split("/")
+    .pop()
+    .split(".")[0];
+  const videoDeletedResponse = await deleteFromCloudinary(videoPublicId);
+  const thumbnailDeletedResponse =
+    await deleteFromCloudinary(thumbnailPublicId);
+
+  console.log(videoDeletedResponse);
+  console.log(thumbnailDeletedResponse);
+  const deletedVideo = await Video.findByIdAndDelete(videoId);
+
+  return res
+    .status(200)
+    .json(new ApiRespones(200, deleteVideo, "delted video successfully"));
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {

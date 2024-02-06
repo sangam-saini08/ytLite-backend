@@ -16,7 +16,7 @@ const playlistSchema = new Schema(
         ref: "User",
       },
     ],
-    owenr: {
+    owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },

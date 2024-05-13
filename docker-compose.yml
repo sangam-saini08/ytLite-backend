@@ -1,0 +1,24 @@
+version: '3.1'
+services:
+  database:
+    image: mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo_data:/data/db
+
+
+  app:
+    restart: always
+    image: ytlite
+    env_file:
+      - docker.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - database  
+
+volumes:
+  mongo_data:
+
+        

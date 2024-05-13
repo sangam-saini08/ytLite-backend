@@ -60,7 +60,7 @@ const resgisterUser = asyncHandler(async (req, res) => {
   }
 
   if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar file is required");
+    throw new ApiError(400, "Avatar local file is required");
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
@@ -71,7 +71,7 @@ const resgisterUser = asyncHandler(async (req, res) => {
   }
 
   if (!avatar) {
-    throw new ApiError(400, "Avatar file is required");
+    throw new ApiError(400, "Avatar cloudnary file is required");
   }
 
   const user = await User.create({

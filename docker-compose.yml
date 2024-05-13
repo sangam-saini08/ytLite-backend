@@ -10,7 +10,7 @@ services:
 
   app:
     restart: always
-    image: ytlite
+    image: sangamsaini0802/youtubelite:1.0
     env_file:
       - docker.env
     ports:

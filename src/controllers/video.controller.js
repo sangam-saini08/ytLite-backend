@@ -75,20 +75,23 @@ const publishAVideo = asyncHandler(async (req, res) => {
   }
 
   const vidoeLocalPath = req.files.videoFile[0].path;
-  const thumbnailLocalPath = req.files.thumbnail[0].path;
+  const thumbnailLocalPath = req?.files?.thumbnail[0]?.path;
 
   if (!vidoeLocalPath) {
     throw new ApiError(400, "video local path is missing");
   }
 
-  if (!thumbnailLocalPath) {
-    throw new ApiError(400, "thumbnail local path is missing");
-  }
+  // if (!thumbnailLocalPath) {
+  //   throw new ApiError(400, "thumbnail local path is missing");
+  // }
 
   const video = await uploadOnCloudinary(vidoeLocalPath);
-  const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+  let thumbnail;
+  if (thumbnailLocalPath) {
+    thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+  }
 
-  if (!video || !thumbnail) {
+  if (!video) {
     throw new ApiError(
       400,
       "error uploading video and thumnail on cloudinary "
@@ -97,14 +100,14 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
   const uploadedVideo = await Video.create({
     videoFile: video.url,
-    thumbnail: thumbnail.url,
+    thumbnail: thumbnail ? thumbnail.url : "",
     title,
     description,
     duration: video.duration,
     owner: new mongoose.Types.ObjectId(req.user._id),
   });
 
-  if (!updateVideo) {
+  if (!uploadedVideo) {
     throw new ApiError(
       500,
       "Something went wrong while uploading video on database"
@@ -113,7 +116,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
   res
     .status(201)
-    .json(new ApiRespones(201, updateVideo, "video uploaded successfully"));
+    .json(new ApiRespones(201, uploadedVideo, "video uploaded successfully"));
 });
 
 const getVideoById = asyncHandler(async (req, res) => {

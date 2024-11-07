@@ -153,7 +153,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const use = await User.findById(req.user._id);
   console.log(use);
 
-  res
+  return res
     .status(200)
     .clearCookie("access_token", cookieOpitons)
     .clearCookie("refresh_token", cookieOpitons)
@@ -224,7 +224,10 @@ const updatePassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const user = req?.user;
+  // const user = req?.user;
+  const user = await User.findById(req?.user?._id).select(
+    "-password -accessToken"
+  );
   return res
     .status(200)
     .json(new ApiRespones(200, { user }, "current user get successfully"));
